@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Код Призрака</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  .theme-halloween {
+    background-color: #050505;
+    color: #00ff41;
+  }
+  .theme-halloween h1 { text-shadow: 0 0 10px #00ff41; }
+  .theme-halloween input { border: 2px solid #00ff41; color: #00ff41; background: #001100; }
+
+  .theme-newyear {
+    background-color: #1a0000;
+    color: #ffffff;
+  }
+  .theme-newyear h1 { color: #ff3333; text-shadow: 0 0 15px #ff0000; }
+  .theme-newyear p { color: #e0e0e0; }
+  
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    color: #fff;
+    font-size: 1em;
+    animation: fall linear infinite;
+    z-index: 10;
+  }
+  @keyframes fall {
+    to { transform: translateY(105vh); }
+  }
+
+  .theme-glitch {
+    background-color: #000000;
+    color: #ffffff;
+    animation: screenShake 0.2s infinite;
+  }
+  .theme-glitch h1 {
+    font-size: 40px;
+    color: #ff0000;
+    text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff;
+    animation: textGlitch 0.1s infinite;
+  }
+
+  @keyframes screenShake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
+
+  @keyframes textGlitch {
+    0% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; }
+    25% { text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff; }
+    50% { text-shadow: 2px 2px #00ffff, -2px -2px #ff00ff; }
+    75% { text-shadow: -2px 2px #00ffff, 2px -2px #ff00ff; }
+    100% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; }
+  }
+
+  h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; text-align: center; padding: 0 10px;}
+  p { font-size: 15px; margin-bottom: 30px; text-align: center; max-width: 90%; line-height: 1.6; padding: 0 15px;}
+  
+  .inputs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .inputs input {
+    width: 40px; height: 50px;
+    font-size: 24px; text-align: center;
+    font-family: inherit; outline: none;
+  }
+  .inputs input:focus { box-shadow: 0 0 15px currentColor; }
+  
+  .error { color: #ff003c; font-weight: bold; font-size: 18px; display: none; text-shadow: 2px 2px #000; text-align: center;}
+  
+  .screen { display: none; flex-direction: column; align-items: center; width: 100%; padding: 20px; box-sizing: border-box;}
+  .screen.active { display: flex; }
+
+  .ny-text { font-size: 18px; font-weight: bold; color: #ffcccc; }
+  .glitch-text-final { font-size: 36px; font-weight: bold; letter-spacing: 5px; }
+
+</style>
+</head>
+<body class="theme-halloween">
+
+  <div id="screen1" class="screen active">
+    <h1>ВВЕДИТЕ КОД ПРИЗРАКА</h1>
+    <p>5 цифр. Правильный порядок.<br>Иначе он заберет тебя с собой.</p>
+    <div class="inputs">
+      <input type="text" maxlength="1" id="d1" oninput="moveToNext(this, 'd2')">
+      <input type="text" maxlength="1" id="d2" oninput="moveToNext(this, 'd3')">
+      <input type="text" maxlength="1" id="d3" oninput="moveToNext(this, 'd4')">
+      <input type="text" maxlength="1" id="d4" oninput="moveToNext(this, 'd5')">
+      <input type="text" maxlength="1" id="d5" oninput="checkCode()">
+    </div>
+    <div class="error" id="error-msg">ПРИЗРАК ХОХОЧЕТ! ПОРЯДОК НЕВЕРЕН.</div>
+  </div>
+
+  <div id="screen2" class="screen">
+    <h1>ДОСТУП РАЗРЕШЁН</h1>
+    <p id="halloween-msg"></p>
+  </div>
+
+  <div id="screen3" class="screen">
+    <h1>⚠️ ВНИМАНИЕ. СИГНАЛ НЕ ОБРЫВАЕТСЯ... ⚠️</h1>
+    <p class="ny-text">
+      Думаете, на этом всё?<br><br>
+      Призрак ушел, но холод в ресторане остался.<br>
+      В НОВОГОДНЮЮ НОЧЬ СМЕНА БУДЕТ НЕ ИЗ ЛЁГКИХ.<br><br>
+      Дед Мороз здесь не один.<br>
+      И мешок у него не с подарками, а с непроверенными заказами и забытыми трубочками...<br><br>
+      Следите за графиком... ❄️👻
+    </p>
+  </div>
+
+  <div id="screen4" class="screen">
+    <h1 class="glitch-text-final">СМЕНА НЕ ЗАКОНЧЕНА</h1>
+  </div>
+
+<script>
+  function createSnowflakes() {
+    for(let i=0; i<40; i++) {
+      let flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.innerText = '❄';
+      flake.style.left = Math.random() * 100 + 'vw';
+      flake.style.animationDuration = Math.random() * 3 + 2 + 's';
+      flake.style.opacity = Math.random();
+      flake.style.fontSize = Math.random() * 10 + 10 + 'px';
+      document.body.appendChild(flake);
+    }
+  }
+
+  function moveToNext(current, nextId) {
+    if (current.value.length >= 1) document.getElementById(nextId).focus();
+  }
+
+  function typeWriter(elementId, text, speed) {
+    let i = 0;
+    let elem = document.getElementById(elementId);
+    elem.innerHTML = "";
+    function type() {
+      if (i < text.length) {
+        elem.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      }
+    }
+    type();
+  }
+
+  function checkCode() {
+    let code = '';
+    for(let i=1; i<=5; i++) code += document.getElementById('d'+i).value;
+    
+    if (code.length === 5) {
+      if (code === '26027') {
+        document.getElementById('screen1').classList.remove('active');
+        document.getElementById('screen2').classList.add('active');
+        
+        const msg = "Поздравляю, работяги… Вы собрали код моего предприятия — 26027. Вы доказали, что знаете свое дело. Вы не забыли ни одной салфетки, ни одной трубочки, ни одного миллилитра соуса.\n\nНо знаете, что самое страшное? Я был одним из вас. Я стоял на этом самом прилавке, носил такую же форму и был менеджером. Однажды, в далеком 2019 году, после 22:00, на моей смене произошла катастрофа. Кто-то забыл положить соус и чизбургер в заказ КПП. \n\nС тех пор я блуждаю между напитками и фритюром, пытаясь оградить вас от ошибок, которые совершил сам. Я пугал ночников, которые плохо отмывали гриль. Я прятал бадейки с влажными салфетками. \n\nНО ВЫ… Вы прошли мой экзамен. Вы сняли моё проклятие. Теперь я могу уйти со спокойной совестью, зная, что в этом ресторане больше не забудут и не перепутают ничего! Примите дар от Призрака Неполного Заказа...";
+        
+        typeWriter('halloween-msg', msg, 40); 
+
+        setTimeout(() => {
+          document.body.className = 'theme-newyear';
+          document.getElementById('screen2').classList.remove('active');
+          document.getElementById('screen3').classList.add('active');
+          createSnowflakes();
+
+          setTimeout(() => {
+            document.querySelectorAll('.snowflake').forEach(e => e.remove());
+            
+            document.body.className = 'theme-glitch';
+            document.getElementById('screen3').classList.remove('active');
+            document.getElementById('screen4').classList.add('active');
+          }, 20000);
+
+        }, 45000);
+
+      } else {
+        document.getElementById('error-msg').style.display = 'block';
+        document.body.style.animation = "screenShake 0.3s";
+        setTimeout(() => {
+          document.getElementById('error-msg').style.display = 'none';
+          document.body.style.animation = "none";
+          for(let i=1; i<=5; i++) document.getElementById('d'+i).value = '';
+          document.getElementById('d1').focus();
+        }, 1500);
+      }
+    }
+  }
+</script>
+</body>
+</html>
