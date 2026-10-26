@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Код Призрака</title>
 <style>
+  /* БАЗОВЫЕ СТИЛИ */
   body {
     margin: 0;
     padding: 0;
@@ -18,6 +19,7 @@
     transition: background-color 0.5s ease, color 0.5s ease;
   }
 
+  /* ТЕМА 1: ХЕЛЛОУИН */
   .theme-halloween {
     background-color: #050505;
     color: #00ff41;
@@ -25,6 +27,7 @@
   .theme-halloween h1 { text-shadow: 0 0 10px #00ff41; }
   .theme-halloween input { border: 2px solid #00ff41; color: #00ff41; background: #001100; }
 
+  /* ТЕМА 2: НОВЫЙ ГОД */
   .theme-newyear {
     background-color: #1a0000;
     color: #ffffff;
@@ -32,6 +35,7 @@
   .theme-newyear h1 { color: #ff3333; text-shadow: 0 0 15px #ff0000; }
   .theme-newyear p { color: #e0e0e0; }
   
+  /* Снежинки для Нового года */
   .snowflake {
     position: absolute;
     top: -10px;
@@ -44,6 +48,7 @@
     to { transform: translateY(105vh); }
   }
 
+  /* ТЕМА 3: ГЛИТЧ / БЛЭКАУТ */
   .theme-glitch {
     background-color: #000000;
     color: #ffffff;
@@ -78,10 +83,11 @@
     100% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; }
   }
 
-  h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; text-align: center; padding: 0 10px;}
-  p { font-size: 15px; margin-bottom: 30px; text-align: center; max-width: 90%; line-height: 1.6; padding: 0 15px;}
+  /* ЭЛЕМЕНТЫ ИНТЕРФЕЙСА */
+  h1 { font-size: 22px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; text-align: center; padding: 0 10px; position: relative; z-index: 2;}
+  p { font-size: 15px; margin-bottom: 30px; text-align: center; max-width: 90%; line-height: 1.6; padding: 0 15px; position: relative; z-index: 2;}
   
-  .inputs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .inputs { display: flex; gap: 10px; margin-bottom: 20px; position: relative; z-index: 2;}
   .inputs input {
     width: 40px; height: 50px;
     font-size: 24px; text-align: center;
@@ -89,19 +95,31 @@
   }
   .inputs input:focus { box-shadow: 0 0 15px currentColor; }
   
-  .error { color: #ff003c; font-weight: bold; font-size: 18px; display: none; text-shadow: 2px 2px #000; text-align: center;}
+  .error { color: #ff003c; font-weight: bold; font-size: 18px; display: none; text-shadow: 2px 2px #000; text-align: center; position: relative; z-index: 2;}
   
-  .screen { display: none; flex-direction: column; align-items: center; width: 100%; padding: 20px; box-sizing: border-box;}
+  .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; justify-content: center;}
   .screen.active { display: flex; }
 
   .ny-text { font-size: 18px; font-weight: bold; color: #ffcccc; }
   .glitch-text-final { font-size: 36px; font-weight: bold; letter-spacing: 5px; }
 
+  /* СТИЛИ ДЛЯ ПАУТИНЫ */
+  #web-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none; /* Чтобы клики проходили сквозь паутину к полям ввода */
+  }
 </style>
 </head>
 <body class="theme-halloween">
 
+  <!-- ЭКРАН 1: ВВОД КОДА С ПАУТИНОЙ -->
   <div id="screen1" class="screen active">
+    <canvas id="web-canvas"></canvas>
     <h1>ВВЕДИТЕ КОД ПРИЗРАКА</h1>
     <p>5 цифр. Правильный порядок.<br>Иначе он заберет тебя с собой.</p>
     <div class="inputs">
@@ -114,11 +132,13 @@
     <div class="error" id="error-msg">ПРИЗРАК ХОХОЧЕТ! ПОРЯДОК НЕВЕРЕН.</div>
   </div>
 
+  <!-- ЭКРАН 2: ХЕЛЛОУИН ФИНАЛ -->
   <div id="screen2" class="screen">
     <h1>ДОСТУП РАЗРЕШЁН</h1>
     <p id="halloween-msg"></p>
   </div>
 
+  <!-- ЭКРАН 3: НОВЫЙ ГОД -->
   <div id="screen3" class="screen">
     <h1>⚠️ ВНИМАНИЕ. СИГНАЛ НЕ ОБРЫВАЕТСЯ... ⚠️</h1>
     <p class="ny-text">
@@ -131,11 +151,92 @@
     </p>
   </div>
 
+  <!-- ЭКРАН 4: ГЛИТЧ -->
   <div id="screen4" class="screen">
     <h1 class="glitch-text-final">СМЕНА НЕ ЗАКОНЧЕНА</h1>
   </div>
 
 <script>
+  // === АНИМАЦИЯ ПАУТИНЫ ===
+  const canvas = document.getElementById('web-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animationId;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.4; // Очень медленное движение
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.size = Math.random() * 2 + 1;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    }
+    draw() {
+      ctx.fillStyle = 'rgba(0, 255, 65, 0.6)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    // Адаптивное количество точек в зависимости от ширины экрана
+    const numberOfParticles = Math.min(Math.floor(window.innerWidth / 12), 80);
+    for (let i = 0; i < numberOfParticles; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animateWeb() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 140) {
+          ctx.beginPath();
+          // Чем ближе точки, тем ярче нить паутины
+          const opacity = 0.2 - (distance / 140) * 0.2;
+          ctx.strokeStyle = `rgba(0, 255, 65, ${opacity})`;
+          ctx.lineWidth = 0.8;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    animationId = requestAnimationFrame(animateWeb);
+  }
+
+  // Запуск паутины
+  initParticles();
+  animateWeb();
+
+  // Функция остановки паутины (вызывается при успешном вводе кода)
+  function stopWebAnimation() {
+    cancelAnimationFrame(animationId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  // ========================
+
+  // Создание снежинок для новогодней темы
   function createSnowflakes() {
     for(let i=0; i<40; i++) {
       let flake = document.createElement('div');
@@ -173,6 +274,10 @@
     
     if (code.length === 5) {
       if (code === '26027') {
+        // ОСТАНАВЛИВАЕМ ПАУТИNU ПЕРЕД ПЕРЕХОДОМ
+        stopWebAnimation();
+
+        // ПЕРЕХОД К ХЕЛЛОУИН ФИНАЛУ
         document.getElementById('screen1').classList.remove('active');
         document.getElementById('screen2').classList.add('active');
         
@@ -197,6 +302,7 @@
         }, 45000);
 
       } else {
+        // ОШИБКА
         document.getElementById('error-msg').style.display = 'block';
         document.body.style.animation = "screenShake 0.3s";
         setTimeout(() => {
