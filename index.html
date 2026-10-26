@@ -141,10 +141,11 @@
   </div>
 
 <script>
+  // === НАСТОЯЩАЯ ПАУТИНА ===
   const canvas = document.getElementById('web-canvas');
   const ctx = canvas.getContext('2d');
-  let particles = [];
   let animationId;
+  let time = 0;
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -153,66 +154,112 @@
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
-      this.vx = (Math.random() - 0.5) * 0.4;
-      this.vy = (Math.random() - 0.5) * 0.4;
-      this.size = Math.random() * 2 + 1;
+  // Паутина с центром в углу экрана
+  class SpiderWeb {
+    constructor(x, y, radius, rays, rings) {
+      this.x = x;
+      this.y = y;
+      this.radius = radius;
+      this.rays = rays; // количество радиальных нитей
+      this.rings = rings; // количество спиральных колец
+      this.angleOffset = Math.random() * Math.PI * 2;
+      this.wobble = Math.random() * 0.5 + 0.3; // амплитуда покачивания
     }
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-    }
-    draw() {
+
+    draw(ctx, time) {
+      ctx.strokeStyle = 'rgba(0, 255, 65, 0.4)';
+      ctx.lineWidth = 0.8;
+      ctx.lineCap = 'round';
+
+      // Рисуем радиальные нити (лучи от центра)
+      const rayPoints = [];
+      for (let i = 0; i < this.rays; i++) {
+        const angle = this.angleOffset + (i / this.rays) * Math.PI * 2;
+        // Добавляем легкое покачивание
+        const wobbleAngle = angle + Math.sin(time * 0.001 + i) * 0.02 * this.wobble;
+        const endX = this.x + Math.cos(wobbleAngle) * this.radius;
+        const endY = this.y + Math.sin(wobbleAngle) * this.radius;
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        
+        rayPoints.push({ x: endX, y: endY, angle: wobbleAngle });
+      }
+
+      // Рисуем спиральные кольца
+      for (let r = 1; r <= this.rings; r++) {
+        const ringRadius = (r / this.rings) * this.radius;
+        ctx.beginPath();
+        for (let i = 0; i <= this.rays; i++) {
+          const idx = i % this.rays;
+          const angle = this.angleOffset + (idx / this.rays) * Math.PI * 2;
+          const wobbleAngle = angle + Math.sin(time * 0.001 + idx) * 0.02 * this.wobble;
+          
+          // Добавляем неровность спирали
+          const wobbleRadius = ringRadius + Math.sin(time * 0.002 + r + idx) * 3;
+          
+          const px = this.x + Math.cos(wobbleAngle) * wobbleRadius;
+          const py = this.y + Math.sin(wobbleAngle) * wobbleRadius;
+          
+          if (i === 0) {
+            ctx.moveTo(px, py);
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // Рисуем центр (узел паутины)
       ctx.fillStyle = 'rgba(0, 255, 65, 0.6)';
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
-  function initParticles() {
-    particles = [];
-    const numberOfParticles = Math.min(Math.floor(window.innerWidth / 12), 80);
-    for (let i = 0; i < numberOfParticles; i++) {
-      particles.push(new Particle());
-    }
+  // Создаем несколько паутин в разных углах экрана
+  const webs = [];
+  
+  function initWebs() {
+    webs.length = 0;
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    // Паутина в левом верхнем углу
+    webs.push(new SpiderWeb(0, 0, Math.min(w, h) * 0.35, 12, 8));
+    // Паутина в правом верхнем углу
+    webs.push(new SpiderWeb(w, 0, Math.min(w, h) * 0.3, 10, 7));
+    // Паутина в левом нижнем углу
+    webs.push(new SpiderWeb(0, h, Math.min(w, h) * 0.25, 8, 6));
+    // Паутина в правом нижнем углу
+    webs.push(new SpiderWeb(w, h, Math.min(w, h) * 0.28, 9, 7));
+    // Большая паутина по центру (чуть прозрачнее)
+    webs.push(new SpiderWeb(w * 0.5, h * 0.3, Math.min(w, h) * 0.2, 14, 10));
   }
 
   function animateWeb() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update();
-      particles[i].draw();
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < 140) {
-          ctx.beginPath();
-          const opacity = 0.2 - (distance / 140) * 0.2;
-          ctx.strokeStyle = `rgba(0, 255, 65, ${opacity})`;
-          ctx.lineWidth = 0.8;
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.stroke();
-        }
-      }
+    time += 16;
+    
+    for (const web of webs) {
+      web.draw(ctx, time);
     }
+    
     animationId = requestAnimationFrame(animateWeb);
   }
 
-  initParticles();
+  initWebs();
   animateWeb();
 
   function stopWebAnimation() {
     cancelAnimationFrame(animationId);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
+  // ========================
 
   function createSnowflakes() {
     for(let i=0; i<40; i++) {
