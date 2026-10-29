@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Улики Призрака</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #0a0a0a;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .story-text {
+    max-width: 800px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 30px;
+    margin-bottom: 25px;
+    color: #88ff88;
+    padding: 15px;
+    border: 1px dashed #00ff41;
+    background: #050505;
+  }
+
+  .photos-container {
+    display: flex;
+    gap: 15px;
+    max-width: 1200px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .photo-wrapper {
+    flex: 1;
+    min-width: 280px;
+    max-width: 550px;
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: auto;
+    border: 2px solid #00ff41;
+    border-radius: 5px;
+    display: block;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+  }
+
+  .photo-label {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #00ff41;
+  }
+
+  .instruction {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #ff3333;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Адаптив для телефонов */
+  @media (max-width: 600px) {
+    .story-text { font-size: 13px; margin-top: 15px; }
+    .photo-wrapper { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="story-text">
+    Вы видите 2 фотографии с места, где была совершена непростительная дерзость. 
+    Глупый юнец забыл в доставку несколько сандвичей и не удосужился перепроверить заказ перед заклеиванием. 
+    Этого парня вы, увы, больше никогда не увидите… Его с собой забрал Призрак неполного заказа. 
+    Но он оставил 5 улик после себя. Найдите все и расскажите о них Ведущему.
+  </div>
+
+  <div class="photos-container">
+    <div class="photo-wrapper">
+      <img src="photo1.jpg" alt="Фото 1">
+      <div class="photo-label">📷 Фотография #1</div>
+    </div>
+
+    <div class="photo-wrapper">
+      <img src="photo2.jpg" alt="Фото 2">
+      <div class="photo-label">📷 Фотография #2</div>
+    </div>
+  </div>
+
+  <div class="instruction">
+    Найдите 5 отличий и подойдите к Ведущему!
+  </div>
+
+</body>
+</html>
