@@ -108,14 +108,12 @@
     height: 100%;
   }
   
-  /* Цвет нитей паутины: полупрозрачный серый */
   .web-line {
     stroke: rgba(200, 200, 200, 0.25);
     stroke-width: 0.8;
     fill: none;
   }
   
-  /* Цвет центрального узла: чуть более яркий белый */
   .web-center {
     fill: rgba(220, 220, 220, 0.5);
   }
@@ -145,7 +143,7 @@
   </div>
 
   <div id="screen3" class="screen">
-    <h1>⚠️ ВНИМАНИЕ. СИГНАЛ НЕ ОБРЫВАЕТСЯ... ⚠️</h1>
+    <h1>️ ВНИМАНИЕ. СИГНАЛ НЕ ОБРЫВАЕТСЯ... ⚠️</h1>
     <p class="ny-text">
       Думаете, на этом всё?<br><br>
       Призрак ушел, но холод в ресторане остался.<br>
@@ -213,102 +211,4 @@
         }
         pathData += ' Z'; 
         
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathData);
-        path.setAttribute('class', 'web-line');
-        svg.appendChild(path);
-      }
-      
-      const center = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      center.setAttribute('cx', corner.x);
-      center.setAttribute('cy', corner.y);
-      center.setAttribute('r', 3);
-      center.setAttribute('class', 'web-center');
-      svg.appendChild(center);
-    });
-  }
-  
-  createSpiderWeb();
-  window.addEventListener('resize', createSpiderWeb);
-  
-  function stopWebAnimation() {
-    const svg = document.getElementById('web-svg');
-    svg.innerHTML = ''; 
-  }
-  // ========================
-
-  function createSnowflakes() {
-    for(let i=0; i<40; i++) {
-      let flake = document.createElement('div');
-      flake.className = 'snowflake';
-      flake.innerText = '❄';
-      flake.style.left = Math.random() * 100 + 'vw';
-      flake.style.animationDuration = Math.random() * 3 + 2 + 's';
-      flake.style.opacity = Math.random();
-      flake.style.fontSize = Math.random() * 10 + 10 + 'px';
-      document.body.appendChild(flake);
-    }
-  }
-
-  function moveToNext(current, nextId) {
-    if (current.value.length >= 1) document.getElementById(nextId).focus();
-  }
-
-  function typeWriter(elementId, text, speed) {
-    let i = 0;
-    let elem = document.getElementById(elementId);
-    elem.innerHTML = "";
-    function type() {
-      if (i < text.length) {
-        elem.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, speed);
-      }
-    }
-    type();
-  }
-
-  function checkCode() {
-    let code = '';
-    for(let i=1; i<=5; i++) code += document.getElementById('d'+i).value;
-    
-    if (code.length === 5) {
-      if (code === '26027') {
-        stopWebAnimation();
-        document.getElementById('screen1').classList.remove('active');
-        document.getElementById('screen2').classList.add('active');
-        
-        const msg = "Поздравляю, работяги… Вы собрали код моего предприятия — 26027. Вы доказали, что знаете свое дело. Вы не забыли ни одной салфетки, ни одной трубочки, ни одного миллилитра соуса.\n\nНо знаете, что самое страшное? Я был одним из вас. Я стоял на этом самом прилавке, носил такую же форму и был менеджером. Однажды, в далеком 2019 году, после 22:00, на моей смене произошла катастрофа. Кто-то забыл положить соус и чизбургер в заказ КПП. \n\nС тех пор я блуждаю между напитками и фритюром, пытаясь оградить вас от ошибок, которые совершил сам. Я пугал ночников, которые плохо отмывали гриль. Я прятал бадейки с влажными салфетками. \n\nНО ВЫ… Вы прошли мой экзамен. Вы сняли моё проклятие. Теперь я могу уйти со спокойной совестью, зная, что в этом ресторане больше не забудут и не перепутают ничего! Примите дар от Призрака Неполного Заказа...";
-        
-        typeWriter('halloween-msg', msg, 40); 
-
-        setTimeout(() => {
-          document.body.className = 'theme-newyear';
-          document.getElementById('screen2').classList.remove('active');
-          document.getElementById('screen3').classList.add('active');
-          createSnowflakes();
-
-          setTimeout(() => {
-            document.querySelectorAll('.snowflake').forEach(e => e.remove());
-            document.body.className = 'theme-glitch';
-            document.getElementById('screen3').classList.remove('active');
-            document.getElementById('screen4').classList.add('active');
-          }, 20000);
-
-        }, 45000);
-
-      } else {
-        document.getElementById('error-msg').style.display = 'block';
-        document.body.style.animation = "screenShake 0.3s";
-        setTimeout(() => {
-          document.getElementById('error-msg').style.display = 'none';
-          document.body.style.animation = "none";
-          for(let i=1; i<=5; i++) document.getElementById('d'+i).value = '';
-          document.getElementById('d1').focus();
-        }, 1500);
-      }
-    }
-  }
-</script>
-</body>
-</html>
+        const path = document.createElementNS('http://www.w3.org/2000/svg',ivors1gar sp,all. sp,
